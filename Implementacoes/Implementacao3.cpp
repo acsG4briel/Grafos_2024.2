@@ -38,7 +38,7 @@ class BuscaDijkstra
 
           vector<int> caminho;
   
-          priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> fila;
+          priority_queue<pair<int, int>> fila;
   
           distancia[origem] = 0;
           fila.push(make_pair(0, origem));
@@ -82,7 +82,7 @@ class BuscaMinMax
 
           vector<int> caminho;
 
-          priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> fila;
+          priority_queue<pair<int, int>> fila;
 
           distancia[origem] = 0;
           fila.push(make_pair(0, origem));
@@ -121,47 +121,46 @@ class BuscaMinMax
 class BuscaMaxMin 
 {
   public:
-      vector<int> calcularMenorCaminho(Grafo& grafo, int origem, int destino) 
-      {
-          vector<int> distancia(grafo.numeroDeVertices, INT_MAX);
-          vector<int> predecessor(grafo.numeroDeVertices, -1);
-
-          vector<int> caminho;
-
-          priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> fila;
-
-          distancia[origem] = 0;
-          fila.push(make_pair(0, origem));
-
-          while (!fila.empty()) 
-          {
-              int u = fila.top().second; 
-              fila.pop();
-
-              for (const auto& par : grafo.adjacencias[u]) 
-              {
-                  int v = par.first;  
-                  int peso = par.second; 
-
-                  int novoMinimo = min(distancia[u], peso);
-
-                  if (novoMinimo < distancia[v]) 
-                  {
-                      distancia[v] = novoMinimo;
-                      predecessor[v] = u;
-                      fila.push(make_pair(distancia[v], v));
-                  }
-              }
-          }
-
-          for (int v = destino; v != -1; v = predecessor[v]) {
-              caminho.push_back(v);
-          }
-
-          reverse(caminho.begin(), caminho.end());
-
-          return caminho;
-      }
+    vector<int> calcularMenorCaminho(Grafo& grafo, int origem, int destino) 
+    {
+        vector<int> distancia(grafo.numeroDeVertices, INT_MIN);
+        vector<int> predecessor(grafo.numeroDeVertices, -1);
+        vector<int> caminho;
+    
+        distancia[origem] = INT_MAX; 
+        priority_queue<pair<int, int>> fila;
+      
+        fila.push(make_pair(INT_MAX, origem)); 
+    
+        while (!fila.empty()) 
+        {
+            int u = fila.top().second; 
+            fila.pop();
+    
+            for (const auto& par : grafo.adjacencias[u]) 
+            {
+                int v = par.first;  
+                int peso = par.second; 
+    
+                int novoMinimo = min(distancia[u], peso);
+    
+                if (novoMinimo > distancia[v]) 
+                {
+                    distancia[v] = novoMinimo;
+                    predecessor[v] = u;
+                    fila.push(make_pair(distancia[v], v));
+                }
+            }
+        }
+    
+        for (int v = destino; v != -1; v = predecessor[v]) {
+            caminho.push_back(v);
+        }
+    
+        reverse(caminho.begin(), caminho.end());
+    
+        return caminho;
+    }
 };
 
 void ExecutarBuscaDjikstra(Grafo& grafo, int origem, int destino)
@@ -213,6 +212,7 @@ int main()
     grafo.adicionarAresta(0, 1, 5);
     grafo.adicionarAresta(0, 4, 2);
     grafo.adicionarAresta(1, 3, 2);
+    grafo.adicionarAresta(1, 4, 7);
     grafo.adicionarAresta(4, 2, 1);
     grafo.adicionarAresta(4, 5, 10);
     grafo.adicionarAresta(2, 3, 3);
